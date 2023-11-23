@@ -2,9 +2,14 @@ package PaooGame.Items;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 import PaooGame.RefLinks;
 import PaooGame.Graphics.Assets;
+import PaooGame.States.PauseState;
+import PaooGame.States.PlayState;
+import PaooGame.States.State;
+import PaooGame.Tiles.Tile;
 
 /*! \class public class Hero extends Character
     \brief Implementeaza notiunea de erou/player (caracterul controlat de jucator).
@@ -21,6 +26,17 @@ public class Hero extends Character
     private float ScreenX;
     private float ScreenY;
 
+    protected boolean hasKey = false;
+    protected boolean openedChest = false;
+
+    protected int armorLevel = 1;
+    private int Score = 0;
+
+    private int Kills = 0;
+
+
+    private PauseState pauseState;
+
     /*! \fn public Hero(RefLinks refLink, float x, float y)
         \brief Constructorul de initializare al clasei Hero.
 
@@ -31,8 +47,11 @@ public class Hero extends Character
     public Hero(RefLinks refLink, float x, float y)
     {
             ///Apel al constructorului clasei de baza
-        super(refLink, x,y, Character.DEFAULT_CREATURE_WIDTH, Character.DEFAULT_CREATURE_HEIGHT);
+        super(refLink, x,y, Character.DEFAULT_CREATURE_WIDTH, Character.DEFAULT_CREATURE_HEIGHT, 0);
             ///Seteaza imaginea de start a eroului
+        //damage = 250;
+        life = 200;
+        maxLife = life;
         image = Assets.heroLeft1;
             ///Stabilieste pozitia relativa si dimensiunea dreptunghiului de coliziune, starea implicita(normala)
         normalBounds.x = 32;
@@ -65,6 +84,15 @@ public class Hero extends Character
     @Override
     public void Update()
     {
+        /// Se verifica daca nivelul de viata a ajuns la 0 (daca jucatorul a pierdut jocul)
+        if(life<=0){
+            pauseState = (PauseState) refLink.GetGame().GetState(3);
+            if(pauseState!=null)
+                pauseState.SetMenu(2);
+            State.SetState(refLink.GetGame().GetState(3));
+        }
+
+
             ///Verifica daca a fost apasata o tasta
         GetInput();
             ///Actualizeaza pozitia
@@ -156,21 +184,23 @@ public class Hero extends Character
                     }
                 }
         }
-        else{
+        else {
             animationCounter++;
             // Daca contorul depaseste o valoare prestabilita (5), acesta se reseteaza si creste indexul de animatie
-            if(animationCounter>5){
-                animationCounter=0;
+            if (animationCounter > 5) {
+                animationCounter = 0;
                 animationIndex++;
                 // Daca indexul depaseste valoarea maxima de imagini pentru o animatie (5), acesta se reseteaza la valoarea 1.
-                if(animationIndex>5)
-                    animationIndex=1;
+                if (animationIndex > 5) {
+                    animationIndex = 1;
+                    refLink.PlaySound(1);
+                }
             }
 
             /// In functie de directia eroului, se incarca animatiile de atac.
-            switch(facingPos){
+            switch (facingPos) {
                 case 1:
-                    switch(animationIndex){
+                    switch (animationIndex) {
                         case 1:
                             image = Assets.heroRightAttack1;
                             break;
@@ -191,7 +221,7 @@ public class Hero extends Character
                     }
                     break;
                 case 2:
-                    switch(animationIndex){
+                    switch (animationIndex) {
                         case 1:
                             image = Assets.heroLeftAttack1;
                             break;
@@ -212,7 +242,7 @@ public class Hero extends Character
                     }
                     break;
                 case 3:
-                    switch(animationIndex){
+                    switch (animationIndex) {
                         case 1:
                             image = Assets.heroUpAttack1;
                             break;
@@ -233,7 +263,7 @@ public class Hero extends Character
                     }
                     break;
                 case 4:
-                    switch(animationIndex){
+                    switch (animationIndex) {
                         case 1:
                             image = Assets.heroDownAttack1;
                             break;
@@ -254,28 +284,78 @@ public class Hero extends Character
                     }
                     break;
             }
+
+        }
+
+
+        /// Verificam daca jucatorul a ajuns in punctul de trecere dintre niveluri si setam noul nivel in caz pozitiv
+        int xTile,yTile;
+        xTile = (int)((x+bounds.x)/25);
+        yTile = (int)((y+bounds.y)/25);
+        PlayState playState = (PlayState) refLink.GetGame().GetState(1);
+        switch (playState.GetLevel()){
+            case 1:
+                if(xTile == 58 && (yTile >= 13 && yTile <= 14)) {
+                    playState.SetLevel(2);
+                    x = 16;
+                    y = 214;
+                }
+                break;
+            case 2:
+                if((xTile == 46 || xTile == 45) && yTile == 0) {
+                    playState.SetLevel(3);
+                    x = 1120;
+                    y = 742;
+                }
+                break;
         }
     }
 
-    // Se verifica daca dalele xTile si yTile se afla in interiorul hartii
-    private boolean CheckIfInsideMap(int xTile,int yTile){
-        if(xTile >= 0 && xTile <= 59 && yTile >= 0 && yTile <= 32)
-            return true;
+    /// Un caracter este atacat de catre erou
+    /// Se scade nivelul de viata a inamicului pana ajunge 0, caz in care acesta este distrus
+    private boolean AttackCharacter(Character character) {
+            if (character.invincible == false) {
+                character.invincible = true;
+                attackingCounter = 0;
+                if (GetDamage() >= character.GetLife()) {
+                    character.SetLife(0);
+                    Score += character.characterPoints;
+                    Kills +=1;
+                    if(character.boss){
+                        pauseState = (PauseState) refLink.GetGame().GetState(3);
+                        if(pauseState!=null)
+                            pauseState.SetMenu(3);
+                        State.SetState(refLink.GetGame().GetState(3));
+                    }
+                    refLink.RemoveItem(character);
+                    return true;
+                } else {
+                    //System.out.println("Attack!");
+                    character.SetLife(character.GetLife() - GetDamage());
+                    return false;
+                }
+            }
         return false;
+
+
     }
+
 
     /// Se verifica daca dalele xTile si yTile sunt solide si daca exista vreun inamic pe directia eroului
     boolean CheckCollision(int xTile, int yTile){
         if(CheckIfInsideMap(xTile,yTile) && !refLink.GetMap().GetTile(xTile,yTile).IsSolid() &&
                 (refLink.GetMap().GetObject(xTile,yTile) == null || !refLink.GetMap().GetObject(xTile,yTile).IsSolid())) {
-            for(Item item:refLink.GetItems())
+            ArrayList<Item> items = refLink.GetItems();
+            /*if(refLink.GetChest()!=null)
+                items.add(refLink.GetChest());*/
+            for(Item character:items)
                 switch (facingPos){
                     case 1:
-                        if(x+bounds.x+ bounds.width >= item.x+item.bounds.x && x+ bounds.x <= item.x+item.bounds.x+item.bounds.width && y+bounds.y-12 <= item.y+item.bounds.y && y+ bounds.y+24+ bounds.height >= item.y+item.bounds.y+item.bounds.height)
+                        if(x+bounds.x+ bounds.width >= character.x+character.bounds.x && x+ bounds.x <= character.x+character.bounds.x+character.bounds.width && y+bounds.y-12 <= character.y+character.bounds.y && y+ bounds.y+24+ bounds.height >= character.y+character.bounds.y+character.bounds.height)
                             return true;
                         break;
                     case 2:
-                        if(x+bounds.x+ bounds.width >= item.x+item.bounds.x && x+ bounds.x <= item.x+item.bounds.x+item.bounds.width && x+bounds.x >= item.x+item.bounds.x && y+bounds.y-12 <= item.y+item.bounds.y && y+ bounds.y+24+ bounds.height >= item.y+item.bounds.y+item.bounds.height)
+                        if(x+bounds.x+ bounds.width >= character.x+character.bounds.x && x+ bounds.x <= character.x+character.bounds.x+character.bounds.width && x+bounds.x >= character.x+character.bounds.x && y+bounds.y-12 <= character.y+character.bounds.y && y+ bounds.y+24+ bounds.height >= character.y+character.bounds.y+character.bounds.height)
                             return true;
                         break;
                     case 3:
@@ -285,11 +365,11 @@ public class Hero extends Character
                         System.out.println("Y1: "+(y+bounds.y)+" <  Y2: "+(item.y+item.bounds.y));
                         System.out.println("Y3: "+(y+ bounds.y+ bounds.height)+" >  Y4: "+(item.y+item.bounds.y+item.bounds.height));
                         */
-                        if(x+bounds.x+ bounds.width >= item.x+item.bounds.x && x+ bounds.x <= item.x+item.bounds.x+item.bounds.width && y+bounds.y-12 <= item.y + item.bounds.y + item.bounds.height && y+bounds.y >= item.y + item.bounds.y)
+                        if(x+bounds.x+ bounds.width >= character.x+character.bounds.x && x+ bounds.x <= character.x+character.bounds.x+character.bounds.width && y+bounds.y-12 <= character.y + character.bounds.y + character.bounds.height && y+bounds.y >= character.y + character.bounds.y)
                             return true;
                         break;
                     case 4:
-                        if(x+bounds.x+ bounds.width >= item.x+item.bounds.x && x+ bounds.x <= item.x+item.bounds.x+item.bounds.width && y+bounds.y+ bounds.height+24 >= item.y+item.bounds.y && y+bounds.y+ bounds.height <= item.y+item.bounds.y+item.bounds.height)
+                        if(x+bounds.x+ bounds.width >= character.x+character.bounds.x && x+ bounds.x <= character.x+character.bounds.x+character.bounds.width && y+bounds.y+ bounds.height+24 >= character.y+character.bounds.y && y+bounds.y+ bounds.height <= character.y+character.bounds.y+character.bounds.height)
                             return true;
                         break;
                 }
@@ -402,40 +482,81 @@ public class Hero extends Character
             System.out.println("Y: "+(y+bounds.y+bounds.height)+ "  Tile1: "+yTile1+"  Tile2: "+yTile2);
             */
         } else if (refLink.GetKeyManager().space) {  ///Verificare apasare tasta "space"
-            attacking = true;
-            boolean removed = false;
-            for (Item item:refLink.GetItems()){
-                switch (facingPos){
-                    case 1:
-                        if(x+attackBounds.x+ attackBounds.width >= item.x+item.attackBounds.x && x+ attackBounds.x+ attackBounds.width <= item.x+item.attackBounds.x+item.attackBounds.width && y+attackBounds.y <= item.y+item.attackBounds.y && y+ attackBounds.y+ attackBounds.height >= item.y+item.attackBounds.y+item.attackBounds.height)
-                            //System.out.println("HIT! 1");
-                            {refLink.RemoveItem(item);
-                            removed = true;}
+            if (attacking == false){
+                attacking = true;
+                boolean removed = false;
+                for (Item character : refLink.GetItems()) {
+                    switch (facingPos) {
+                        case 1:
+                            if (x + attackBounds.x + attackBounds.width >= character.x + character.attackBounds.x && x + attackBounds.x + attackBounds.width <= character.x + character.attackBounds.x + character.attackBounds.width && y + attackBounds.y <= character.y + character.attackBounds.y + Tile.TILE_HEIGHT && y + attackBounds.y + attackBounds.height >= character.y + character.attackBounds.y + character.attackBounds.height - Tile.TILE_HEIGHT)
+                                //System.out.println("HIT! 1");
+                                if (AttackCharacter((Character) character))
+                                    removed = true;
+                            break;
+                        case 2:
+                            if (x + attackBounds.x + attackBounds.width >= character.x + character.attackBounds.x && x + attackBounds.x <= character.x + character.attackBounds.x + character.attackBounds.width && x + attackBounds.x >= character.x + character.attackBounds.x && y + attackBounds.y <= character.y + character.attackBounds.y+Tile.TILE_HEIGHT && y + attackBounds.y + attackBounds.height >= character.y + character.attackBounds.y + character.attackBounds.height - Tile.TILE_HEIGHT)
+                                //System.out.println("HIT! 2");
+                                if (AttackCharacter((Character) character))
+                                    removed = true;
+                            break;
+                        case 3:
+                            if (x + attackBounds.x + attackBounds.width >= character.x + character.attackBounds.x + character.attackBounds.width - Tile.TILE_WIDTH && x + attackBounds.x <= character.x + character.attackBounds.x + Tile.TILE_WIDTH && y + attackBounds.y <= character.y + character.attackBounds.y + character.attackBounds.height && y + attackBounds.y >= character.y + character.attackBounds.y)
+                                //System.out.println("HIT! 3");
+                                if (AttackCharacter((Character) character))
+                                    removed = true;
+                            break;
+                        case 4:
+                            if (x + attackBounds.x + attackBounds.width >= character.x + character.attackBounds.x + character.attackBounds.width - Tile.TILE_WIDTH && x + attackBounds.x <= character.x + character.attackBounds.x + Tile.TILE_WIDTH && y + attackBounds.y + attackBounds.height >= character.y + character.attackBounds.y && y + attackBounds.y + attackBounds.height <= character.y + character.attackBounds.y + character.attackBounds.height)
+                                //System.out.println("HIT! 4");
+                                if (AttackCharacter((Character) character))
+                                    removed = true;
+                            break;
+                    }
+                    if (removed)
                         break;
-                    case 2:
-                        if(x+attackBounds.x+ attackBounds.width >= item.x+item.attackBounds.x && x+ attackBounds.x <= item.x+item.attackBounds.x+item.attackBounds.width && x+attackBounds.x >= item.x+item.attackBounds.x && y+attackBounds.y <= item.y+item.attackBounds.y && y+ attackBounds.y+ attackBounds.height >= item.y+item.attackBounds.y+item.attackBounds.height)
-                            //System.out.println("HIT! 2");
-                        {refLink.RemoveItem(item);
-                            removed = true;}
-                        break;
-                    case 3:
-                        if(x+attackBounds.x+ attackBounds.width >= item.x+item.attackBounds.x+item.attackBounds.width && x+ attackBounds.x <= item.x+item.attackBounds.x && y+attackBounds.y <= item.y + item.attackBounds.y + item.attackBounds.height && y+attackBounds.y >= item.y + item.attackBounds.y)
-                            //System.out.println("HIT! 3");
-                        {refLink.RemoveItem(item);
-                            removed = true;}
-                        break;
-                    case 4:
-                        if(x+attackBounds.x+ attackBounds.width >= item.x+item.attackBounds.x+item.attackBounds.width && x+ attackBounds.x <= item.x+item.attackBounds.x && y+attackBounds.y+ attackBounds.height >= item.y+item.attackBounds.y && y+attackBounds.y+ attackBounds.height <= item.y+item.attackBounds.y+item.attackBounds.height)
-                            //System.out.println("HIT! 4");
-                        {refLink.RemoveItem(item);
-                            removed = true;}
-                        break;
-                }
-                if(removed)
-                    break;
 
-            }
+                    }
+                }
+            } else if (refLink.GetKeyManager().escape) {
+                State.SetState(refLink.GetGame().GetState(3));
+            } else if (refLink.GetKeyManager().f) {
+                Chest chest = refLink.GetChest();
+                int TileSize = Tile.TILE_HEIGHT;
+                if(chest!=null){
+                    if((x+normalBounds.x - (chest.x+chest.normalBounds.x+chest.normalBounds.width) <= TileSize*2) && (x+normalBounds.x - (chest.x+chest.normalBounds.x+chest.normalBounds.width)>0)) {
+                        if (y + normalBounds.y + TileSize * 2 >= chest.y + chest.normalBounds.y && y + normalBounds.y + normalBounds.height - TileSize * 2 <= chest.y + chest.normalBounds.y + chest.normalBounds.height)
+                            chest.Open();
+                    } else if (chest.x+chest.normalBounds.x - (x+ normalBounds.x+ normalBounds.x) <= TileSize*2 && chest.x+chest.normalBounds.x - (x+ normalBounds.x+ normalBounds.x)>0) {
+                        if (y + normalBounds.y + TileSize * 2 >= chest.y + chest.normalBounds.y && y + normalBounds.y + normalBounds.height - TileSize * 2 <= chest.y + chest.normalBounds.y + chest.normalBounds.height)
+                            chest.Open();
+                    } else if (chest.y+chest.normalBounds.y - (y+ normalBounds.y+ normalBounds.height) <= TileSize*4 && chest.y+chest.normalBounds.y - (y+ normalBounds.y+ normalBounds.height)>0) {
+                        if(x+normalBounds.x+TileSize*2 >= chest.x+chest.normalBounds.x && x + normalBounds.x + normalBounds.width - TileSize*2 <= chest.x + chest.normalBounds.x + chest.normalBounds.width) {
+                            chest.Open();
+                        }
+                    } else if (y+normalBounds.y - (chest.y+chest.normalBounds.y+chest.normalBounds.height) <= TileSize*2 && y+normalBounds.y - (chest.y+chest.normalBounds.y+chest.normalBounds.height)>0) {
+                        if(x+normalBounds.x+TileSize*2 >= chest.x+chest.normalBounds.x && x + normalBounds.x + normalBounds.width - TileSize*2 <= chest.x + chest.normalBounds.x + chest.normalBounds.width)
+                            chest.Open();
+                    }
+                }
+
+                Key key = refLink.GetKey();
+                if(key!=null && !hasKey){
+                    if((x+normalBounds.x - (key.x+key.normalBounds.x+key.normalBounds.width) <= TileSize*2) && (x+normalBounds.x - (key.x+key.normalBounds.x+key.normalBounds.width)>0)) {
+                        if (y + normalBounds.y + TileSize * 2 >= key.y + key.normalBounds.y && y + normalBounds.y + normalBounds.height - TileSize * 2 <= key.y + key.normalBounds.y + key.normalBounds.height)
+                            key.PickUp();
+                    } else if (key.x+key.normalBounds.x - (x+ normalBounds.x+ normalBounds.x) <= TileSize*2 && key.x+key.normalBounds.x - (x+ normalBounds.x+ normalBounds.x)>0) {
+                        if (y + normalBounds.y + TileSize * 2 >= key.y + key.normalBounds.y && y + normalBounds.y + normalBounds.height - TileSize * 2 <= key.y + key.normalBounds.y + key.normalBounds.height)
+                            key.PickUp();
+                    } else if (key.y+key.normalBounds.y - (y+ normalBounds.y+ normalBounds.height) <= TileSize*2 && key.y+key.normalBounds.y - (y+ normalBounds.y+ normalBounds.height)>0) {
+                        if(x+normalBounds.x+TileSize*2 >= key.x+key.normalBounds.x && x + normalBounds.x + normalBounds.width - TileSize*2 <= key.x + key.normalBounds.x + key.normalBounds.width)
+                            key.PickUp();
+                    } else if (y+normalBounds.y - (key.y+key.normalBounds.y+key.normalBounds.height) <= TileSize*2 && y+normalBounds.y - (key.y+key.normalBounds.y+key.normalBounds.height)>0) {
+                        if(x+normalBounds.x+TileSize*2 >= key.x+key.normalBounds.x && x + normalBounds.x + normalBounds.width - TileSize*2 <= key.x + key.normalBounds.x + key.normalBounds.width)
+                            key.PickUp();
+                    }
+                }
         }
+
 
         // Se incrementeaza contorul la fiecare apasare a unei taste
         if(attacking == false)
@@ -450,6 +571,42 @@ public class Hero extends Character
             }
     }
 
+    public int GetScore(){
+        return Score;
+    }
+
+    public void SetScore(int Score){
+        this.Score = Score;
+    }
+
+    public int GetArmorLevel(){
+        return armorLevel;
+    }
+
+    public void SetArmorLevel(int ArmorLevel){
+        this.armorLevel = ArmorLevel;
+    }
+
+    public int GetKills(){
+        return Kills;
+    }
+
+    public void SetKills(int Kills){
+        this.Kills = Kills;
+    }
+
+    public boolean HasKey(){
+        return hasKey;
+    }
+
+    public boolean HasOpenedChest(){
+        return openedChest;
+    }
+
+    public void SetKey(boolean value){
+        this.hasKey = value;
+    }
+
     /*! \fn public void Draw(Graphics g)
         \brief Randeaza/deseneaza eroul in noua pozitie.
 
@@ -459,6 +616,61 @@ public class Hero extends Character
     public void Draw(Graphics g)
     {
         g.drawImage(image, (int)ScreenX, (int)ScreenY, width, height, null);
+
+        double barScale = (double) (Tile.TILE_WIDTH * 6) / maxLife;
+        double barValue = barScale * life;
+
+        /// Bara
+        g.setColor(new Color(35,35,35,200));
+        g.fillRect(0,0,refLink.GetWidth(),64);
+
+        /// Bara - nivel de viata
+        g.setColor(new Color(0, 0, 0));
+        g.fillRect(46, 20, Tile.TILE_WIDTH * 6 + 4, 24);
+
+        g.setColor(new Color(255, 0, 30));
+        g.fillRect(48, 22, (int) barValue, 20);
+
+        g.drawImage(Assets.lifeIcon,8,16,null);
+
+        /// Armor Level
+
+        g.drawImage(Assets.armorIcon,215,16,null);
+
+        g.setColor(new Color(0, 0, 0));
+        g.fillRect(250, 20, Tile.TILE_WIDTH * 3 + 4, 24);
+
+        g.setColor(new Color(255,255,255));
+        g.setFont(new Font("Impact", Font.PLAIN, 18));
+        g.drawString(String.valueOf(armorLevel),280,38);
+
+        /// Score
+
+        g.setColor(new Color(255,255,255));
+        g.setFont(new Font("Impact", Font.PLAIN, 40));
+        g.drawString(String.valueOf(Score),450,50);
+
+        /// Kills
+
+        g.setColor(new Color(0, 0, 0));
+        g.fillRect(675, 20, Tile.TILE_WIDTH * 3 + 4, 24);
+
+        g.drawImage(Assets.killsIcon,650,16,null);
+
+        g.setColor(new Color(255,255,255));
+        g.setFont(new Font("Impact", Font.PLAIN, 18));
+        g.drawString(String.valueOf(Kills),700,38);
+
+        /// Kills
+
+        g.setColor(new Color(0, 0, 0));
+        g.fillRect(800, 20, Tile.TILE_WIDTH * 3 + 4, 24);
+
+        g.drawImage(Assets.damageIcon,875,16,null);
+
+        g.setColor(new Color(255,255,255));
+        g.setFont(new Font("Impact", Font.PLAIN, 18));
+        g.drawString(String.valueOf(damage),825,38);
 
         /// DEBUG - VIEW HERO WALKING BOUNDS
         //g.setColor(Color.blue);

@@ -11,14 +11,36 @@ import PaooGame.RefLinks;
 public abstract class Character extends Item
 {
     public static final int DEFAULT_LIFE            = 10;   /*!< Valoarea implicita a vietii unui caracter.*/
+
+    public static final int DEFAULT_DAMAGE           = 10;   /*!< Valoarea implicita a daunei cauzate de un caracter.*/
     public static final float DEFAULT_SPEED         = 3.0f; /*!< Viteza implicita a unu caracter.*/
     public static final int DEFAULT_CREATURE_WIDTH  = 96;   /*!< Latimea implicita a imaginii caracterului.*/
     public static final int DEFAULT_CREATURE_HEIGHT = 96;   /*!< Inaltimea implicita a imaginii caracterului.*/
 
+    public static final int DEFAULT_POINTS = 100;   /*!< Punctele obtinute implicit atunci cand caracterul este invins.*/
+
     protected int life;     /*!< Retine viata caracterului.*/
+    protected  int maxLife;
+
+    protected int damage; /*!< Retine dauna pe care o cauzeaza caracterul.*/
+
     protected float speed;  /*!< Retine viteza de deplasare caracterului.*/
     protected float xMove;  /*!< Retine noua pozitie a caracterului pe axa X.*/
     protected float yMove;  /*!< Retine noua pozitie a caracterului pe axa Y.*/
+
+    protected float initialX;
+    protected float initialY;
+
+    protected boolean attacking = false;
+
+    protected boolean invincible = false;
+
+    protected boolean boss = false;
+
+    protected int characterPoints;
+
+    protected int invincibleCounter = 0;
+    protected int attackingCounter = 0;
 
     protected int animationIndex = 1;   /// Retine index-ul animatiei caracterului
     protected int animationCounter = 0; /// Se foloseste pentru a incetini rata de redesenare a animatiilor
@@ -32,15 +54,26 @@ public abstract class Character extends Item
         \param width Latimea imaginii caracterului.
         \param height Inaltimea imaginii caracterului.
      */
-    public Character(RefLinks refLink, float x, float y, int width, int height)
+    public Character(RefLinks refLink, float x, float y, int width, int height, int id)
     {
             ///Apel constructor la clasei de baza
         super(refLink, x,y, width, height);
             //Seteaza pe valorile implicite pentru viata, viteza si distantele de deplasare
+        this.id = id;
+        characterPoints = DEFAULT_POINTS;
         life    = DEFAULT_LIFE;
+        maxLife = life;
         speed   = DEFAULT_SPEED;
+        damage = DEFAULT_DAMAGE;
         xMove   = 0;
         yMove   = 0;
+    }
+
+    // Se verifica daca dalele xTile si yTile se afla in interiorul hartii
+    public boolean CheckIfInsideMap(int xTile,int yTile){
+        if(xTile >= 0 && xTile <= 59 && yTile >= 0 && yTile <= 32)
+            return true;
+        return false;
     }
 
     /*! \fn public void Move()
@@ -72,9 +105,27 @@ public abstract class Character extends Item
         y += yMove;
     }
 
+
+    /*! \fn public int GetDamage()
+        \brief Returneaza dauna cauzata de caracter.
+     */
+    public int GetDamage()
+    {
+        return damage;
+    }
+
     /*! \fn public int GetLife()
         \brief Returneaza viata caracterului.
      */
+
+    /*! \fn public void SetDamage(int damage)
+        \brief Seteaza dauna cauzata de caracter.
+     */
+    public void SetDamage(int damage)
+    {
+        this.damage = damage;
+    }
+
     public int GetLife()
     {
         return life;

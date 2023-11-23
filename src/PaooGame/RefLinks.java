@@ -1,7 +1,8 @@
 package PaooGame;
 
-import PaooGame.Items.Hero;
-import PaooGame.Items.Item;
+import PaooGame.Items.*;
+import PaooGame.Items.Character;
+import PaooGame.States.PlayState;
 import PaooGame.Maps.Map;
 
 import PaooGame.Input.KeyManager;
@@ -20,7 +21,14 @@ public class RefLinks
 
     private Hero hero;          /*!< Referinta catre obiectul Erou.*/
 
+    private Sound sound;  /*!< Referinta catre obiectul Sunet.*/
+
+    private Chest chest;
+    private Key key;
+
     private ArrayList<Item> items;          /*!< Referinta catre o lista de obiecte de tip Item*/
+
+    private ArrayList<Projectile> projectiles;   /*!< Referinta catre o lista de proiectile*/
 
     /*! \fn public RefLinks(Game game)
         \brief Constructorul de initializare al clasei.
@@ -91,11 +99,46 @@ public class RefLinks
     {
         this.map = map;
     }
+
+        /*! \fn public Hero GetChest()
+        \brief Intoarce referinta catre obiectul erou.
+     */
+
+
+    public Chest GetChest() {return chest;}
+
+    /*! \fn public void SetChest(Chest chest)
+        \brief Seteaza referinta catre cufarul din nivelul curent.
+
+        \param map Referinta catre cufarul curent
+     */
+    public void SetChest(Chest chest) {this.chest = chest;}
+
+        /*! \fn public Hero GetChest()
+        \brief Intoarce referinta catre obiectul erou.
+     */
+
+
+    public Key GetKey() {return key;}
+
+    /*! \fn public void SetChest(Chest chest)
+        \brief Seteaza referinta catre cufarul din nivelul curent.
+
+        \param map Referinta catre cufarul curent
+     */
+    public void SetKey(Key key) {this.key = key;}
+
     /*! \fn public Hero GetHero()
         \brief Intoarce referinta catre obiectul erou.
      */
 
+
     public Hero GetHero() {return hero;}
+
+
+     /*! \fn public ArrayList<Item> GetItems()
+        \brief Intoarce referinta catre o lista de obiecte de tip Item.
+     */
 
     /*! \fn public void SetHero(Hero hero)
         \brief Seteaza referinta catre eroul curent.
@@ -126,4 +169,54 @@ public class RefLinks
        \param map Referinta catre o un obiect de tip Item.
     */
     public void RemoveItem(Item item){ this.items.remove(item);}
+
+    /*! \fn public ArrayList<Item> GetProjectiles()
+        \brief Intoarce referinta catre o lista de obiecte de tip Item.
+     */
+
+    public ArrayList<Projectile> GetProjectiles() {return projectiles;}
+
+    /*! \fn public void AddProjectiles(Projectile projectile)
+       \brief Seteaza referinta catre o lista de obiecte de tip Item.
+
+       \param map Referinta catre o lista de obiecte de tip Item.
+    */
+
+    public void SetProjectiles(ArrayList<Projectile> projectiles){ this.projectiles = projectiles;}
+
+    public void AddProjectiles(Projectile projectile) {
+        this.projectiles.add(projectile);
+    }
+
+    /*! \fn public void RemoveProjectile(Item item)
+       \brief Elimina un obiect din lista de obiecte de tip Item.
+
+       \param map Referinta catre o un obiect de tip Item.
+    */
+    public void RemoveProjectile(Projectile projectile){
+        if(!this.projectiles.isEmpty())
+            this.projectiles.remove(projectile);
+    }
+
+    public void SetSound(Sound sound){
+        this.sound = sound;
+    }
+
+    public void PlayMusic(){
+        sound.setFile(0);
+        sound.play();
+        sound.loop();
+    }
+
+    public void StopMusic(){
+        sound.stop();
+    }
+
+    public void PlaySound(int file){
+        if(sound==null)
+            System.out.println("Null Sound");
+        sound.setFile(file);
+        sound.play();
+    }
+
 }

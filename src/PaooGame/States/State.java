@@ -32,6 +32,11 @@ public abstract class State
         currentState = state;
     }
 
+    public static State GetPreviousState()
+    {
+        return previousState;
+    }
+
     public static State GetState()
     {
         return currentState;

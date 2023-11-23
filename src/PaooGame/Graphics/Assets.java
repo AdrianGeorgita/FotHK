@@ -72,6 +72,21 @@ public class Assets
     public static BufferedImage enemy2Idle3;
     public static BufferedImage enemy2Idle4;
 
+    public static BufferedImage enemy3Idle1;
+    public static BufferedImage enemy3Idle2;
+    public static BufferedImage enemy3Idle3;
+    public static BufferedImage enemy3Idle4;
+
+    public static BufferedImage bossIdle1;
+    public static BufferedImage bossIdle2;
+    public static BufferedImage bossIdle3;
+    public static BufferedImage bossIdle4;
+    public static BufferedImage bossIdle5;
+    public static BufferedImage bossIdle6;
+    public static BufferedImage bossIdle7;
+    public static BufferedImage bossIdle8;
+    public static BufferedImage bossIdle9;
+
     /// Plains
 
     public static BufferedImage cliffTopLeft;
@@ -89,6 +104,15 @@ public class Assets
     public static BufferedImage cliffWallLeft;
     public static BufferedImage cliffWallCenter;
     public static BufferedImage cliffWallRight;
+
+    /// Stairs
+
+    public static BufferedImage stairs1;
+    public static BufferedImage stairs2;
+    public static BufferedImage stairs3;
+    public static BufferedImage stairs4;
+    public static BufferedImage stairs5;
+    public static BufferedImage stairs6;
 
     /// Dirt Path
 
@@ -114,6 +138,90 @@ public class Assets
 
     public static BufferedImage rock1;
     public static BufferedImage rock2;
+
+    public static BufferedImage floor1;
+
+    public static BufferedImage wall1;
+
+    public static BufferedImage wall2;
+    public static BufferedImage wall3;
+    public static BufferedImage wall4;
+    public static BufferedImage wall5;
+    public static BufferedImage wall6;
+
+    public static BufferedImage wallLeft;
+    public static BufferedImage wallRight;
+
+    public static BufferedImage wallBottom;
+
+    public static BufferedImage wallCorner1;
+
+    public static BufferedImage wallCorner2;
+
+    public static BufferedImage wallCorner3;
+    public static BufferedImage wallCorner4;
+
+    public static BufferedImage pillar;
+    public static BufferedImage tomb1;
+    public static BufferedImage tomb2;
+    public static BufferedImage tomb3;
+    public static BufferedImage tomb4;
+    public static BufferedImage tomb5;
+    public static BufferedImage tomb6;
+
+    public static BufferedImage tomb7;
+
+    public static BufferedImage tomb8;
+
+    public static BufferedImage tomb9;
+    public static BufferedImage tomb10;
+
+    public static BufferedImage tomb11;
+
+    public static BufferedImage tomb12;
+
+    public static BufferedImage candles1;
+    public static BufferedImage candles2;
+    public static BufferedImage candles3;
+    public static BufferedImage candles4;
+
+    public static BufferedImage lifeIcon;
+    public static BufferedImage armorIcon;
+    public static BufferedImage killsIcon;
+    public static BufferedImage damageIcon;
+
+    public static BufferedImage chest1;
+    public static BufferedImage chest2;
+    public static BufferedImage chest3;
+    public static BufferedImage chest4;
+
+    public static BufferedImage key;
+
+
+    //// Fireball
+    public static BufferedImage fireballRight1;
+    public static BufferedImage fireballRight2;
+    public static BufferedImage fireballRight3;
+    public static BufferedImage fireballRight4;
+    public static BufferedImage fireballRight5;
+
+    public static BufferedImage fireballLeft1;
+    public static BufferedImage fireballLeft2;
+    public static BufferedImage fireballLeft3;
+    public static BufferedImage fireballLeft4;
+    public static BufferedImage fireballLeft5;
+
+    public static BufferedImage fireballUp1;
+    public static BufferedImage fireballUp2;
+    public static BufferedImage fireballUp3;
+    public static BufferedImage fireballUp4;
+    public static BufferedImage fireballUp5;
+
+    public static BufferedImage fireballDown1;
+    public static BufferedImage fireballDown2;
+    public static BufferedImage fireballDown3;
+    public static BufferedImage fireballDown4;
+    public static BufferedImage fireballDown5;
 
     /*! \fn public static void Init()
         \brief Functia initializaza referintele catre elementele grafice utilizate.
@@ -161,6 +269,17 @@ public class Assets
         cliffWallLeft = plainsSheet.crop(7,4);
         cliffWallCenter = plainsSheet.crop(8,4);
         cliffWallRight = plainsSheet.crop(9,4);
+
+        /// Stairs & Entrance
+
+        SpriteSheet stairsSheet = new SpriteSheet(ImageLoader.LoadImage("/textures/StairsBridge.png"));
+
+        stairs1 = stairsSheet.crop(0,1);
+        stairs2 = stairsSheet.crop(1,1);
+        stairs3 = stairsSheet.crop(2,1);
+        stairs4 = stairsSheet.crop(0,2);
+        stairs5 = stairsSheet.crop(1,2);
+        stairs6 = stairsSheet.crop(2,2);
 
         /// Objects
 
@@ -239,5 +358,112 @@ public class Assets
         enemy2Idle2 = enemy2Sheet.crop(1,0);
         enemy2Idle3 = enemy2Sheet.crop(2,0);
         enemy2Idle4 = enemy2Sheet.crop(3,0);
+
+        SpriteSheet enemy3Sheet = new SpriteSheet(ImageLoader.LoadImage("/textures/Enemy3.png"));
+
+        enemy3Idle1 = enemy3Sheet.crop(0,0);
+        enemy3Idle2 = enemy3Sheet.crop(1,0);
+        enemy3Idle3 = enemy3Sheet.crop(2,0);
+        enemy3Idle4 = enemy3Sheet.crop(3,0);
+
+        SpriteSheet bossSheet = new SpriteSheet(ImageLoader.LoadImage("/textures/Boss.png"));
+
+        bossIdle1 = bossSheet.cropScale(0,0,2,2);
+        bossIdle2 = bossSheet.cropScale(2,0,2,2);
+        bossIdle3 = bossSheet.cropScale(4,0,2,2);
+        bossIdle4 = bossSheet.cropScale(6,0,2,2);
+        bossIdle5 = bossSheet.cropScale(8,0,2,2);
+        bossIdle6 = bossSheet.cropScale(10,0,2,2);
+        bossIdle7 = bossSheet.cropScale(12,0,2,2);
+        bossIdle8 = bossSheet.cropScale(14,0,2,2);
+        bossIdle9 = bossSheet.cropScale(16,0,2,2);
+
+        /// Catacombs
+
+        SpriteSheet catacombsSheet = new SpriteSheet(ImageLoader.LoadImage("/textures/catacombs.png"));
+
+        floor1 = catacombsSheet.crop(46,20);
+
+        wall1 = catacombsSheet.crop(4,21);
+        wall2 = catacombsSheet.crop(5,21);
+        wall3 = catacombsSheet.crop(6,21);
+        wall4 = catacombsSheet.crop(7,21);
+        wall5 = catacombsSheet.crop(8,21);
+        wall6 = catacombsSheet.crop(9,21);
+
+        wallLeft = catacombsSheet.crop(4,5);
+        wallRight = catacombsSheet.crop(17,5);
+        wallBottom = catacombsSheet.crop(6,7);
+        wallCorner1 = catacombsSheet.crop(2,3);
+        wallCorner2 = catacombsSheet.crop(17,3);
+        wallCorner3 = catacombsSheet.crop(2,7);
+        wallCorner4 = catacombsSheet.crop(17,7);
+
+        pillar = catacombsSheet.crop(42,11);
+
+        SpriteSheet decorativeSheet = new SpriteSheet(ImageLoader.LoadImage("/textures/decorative.png"));
+
+        tomb1 = decorativeSheet.crop(0,6);
+        tomb2 = decorativeSheet.crop(1,6);
+        tomb3 = decorativeSheet.crop(2,6);
+        tomb4 = decorativeSheet.crop(0,7);
+        tomb5 = decorativeSheet.crop(1,7);
+        tomb6 = decorativeSheet.crop(2,7);
+
+        tomb7 = decorativeSheet.crop(5,4);
+        tomb8 = decorativeSheet.crop(6,4);
+        tomb9 = decorativeSheet.crop(5,5);
+        tomb10 = decorativeSheet.crop(6,5);
+        tomb11 = decorativeSheet.crop(5,6);
+        tomb12 = decorativeSheet.crop(6,6);
+
+        candles1 = decorativeSheet.crop(10,1);
+        candles2 = decorativeSheet.crop(11,1);
+        candles3 = decorativeSheet.crop(12,1);
+        candles4 = decorativeSheet.crop(13,1);
+
+        SpriteSheet iconsSheet = new SpriteSheet(ImageLoader.LoadImage("/textures/Icons.png"));
+
+        lifeIcon = iconsSheet.cropScale(0,0,2,2);
+        armorIcon = iconsSheet.cropScale(2,0,2,2);
+        killsIcon = iconsSheet.cropScale(4,0,2,2);
+        damageIcon = iconsSheet.cropScale(6,0,2,2);
+
+        SpriteSheet chestSheet = new SpriteSheet(ImageLoader.LoadImage("/textures/Chest.png"));
+
+        chest1 = chestSheet.crop(0,0);
+        chest2 = chestSheet.crop(1,0);
+        chest3 = chestSheet.crop(2,0);
+        chest4 = chestSheet.crop(3,0);
+
+        SpriteSheet keySheet = new SpriteSheet(ImageLoader.LoadImage("/textures/Key.png"));
+
+        key = keySheet.crop(0,0);
+
+        SpriteSheet fireballSheet = new SpriteSheet(ImageLoader.LoadImage("/textures/Fireball.png"));
+
+        fireballRight1 = fireballSheet.cropScale(0,0,4,4);
+        fireballRight2 = fireballSheet.cropScale(4,0,4,4);
+        fireballRight3 = fireballSheet.cropScale(8,0,4,4);
+        fireballRight4 = fireballSheet.cropScale(12,0,4,4);
+        fireballRight5 = fireballSheet.cropScale(16,0,4,4);
+
+        fireballLeft1 = fireballSheet.cropScale(0,4,4,4);
+        fireballLeft2 = fireballSheet.cropScale(4,4,4,4);
+        fireballLeft3 = fireballSheet.cropScale(8,4,4,4);
+        fireballLeft4 = fireballSheet.cropScale(12,4,4,4);
+        fireballLeft5 = fireballSheet.cropScale(16,4,4,4);
+
+        fireballUp1 = fireballSheet.cropScale(0,8,4,4);
+        fireballUp2 = fireballSheet.cropScale(4,8,4,4);
+        fireballUp3 = fireballSheet.cropScale(8,8,4,4);
+        fireballUp4 = fireballSheet.cropScale(12,8,4,4);
+        fireballUp5 = fireballSheet.cropScale(16,8,4,4);
+
+        fireballDown1 = fireballSheet.cropScale(0,12,4,4);
+        fireballDown2 = fireballSheet.cropScale(4,12,4,4);
+        fireballDown3 = fireballSheet.cropScale(8,12,4,4);
+        fireballDown4 = fireballSheet.cropScale(12,12,4,4);
+        fireballDown5 = fireballSheet.cropScale(16,12,4,4);
     }
 }

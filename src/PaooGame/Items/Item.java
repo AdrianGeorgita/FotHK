@@ -16,6 +16,7 @@ public abstract class Item
     protected float y;                  /*!< Pozitia pe axa Y a "tablei" de joc a imaginii entitatii.*/
     protected int width;                /*!< Latimea imaginii entitatii.*/
     protected int height;               /*!< Inaltimea imaginii entitatii.*/
+    protected int id;
     protected boolean attacking;
     protected int facingPos;
     protected Rectangle bounds;         /*!< Dreptunghiul curent de coliziune.*/
@@ -122,6 +123,15 @@ public abstract class Item
     /*! \fn public void SetNormalMode()
         \brief Seteaza modul normal de interactiune
      */
+
+    /*! \fn public int GetID()
+    \brief Returneaza id-ul caracterului.
+ */
+    public int GetID()
+    {
+        return id;
+    }
+
     public void SetNormalMode() {
         bounds = normalBounds; attacking = false;
     }

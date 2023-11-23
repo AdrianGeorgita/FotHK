@@ -10,6 +10,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.sql.*;
 
 /*! \class Game
     \brief Clasa principala a intregului proiect. Implementeaza Game - Loop (Update -> Draw)
@@ -50,6 +51,8 @@ public class Game implements Runnable
     private boolean         runState;   /*!< Flag ce starea firului de executie.*/
     private Thread          gameThread; /*!< Referinta catre thread-ul de update si draw al ferestrei*/
     private BufferStrategy  bs;         /*!< Referinta catre un mecanism cu care se organizeaza memoria complexa pentru un canvas.*/
+
+    private Sound sound;    /*!<Referinta catre un obiect de tip sunet*/
     /// Sunt cateva tipuri de "complex buffer strategies", scopul fiind acela de a elimina fenomenul de
     /// flickering (palpaire) a ferestrei.
     /// Modul in care va fi implementata aceasta strategie in cadrul proiectului curent va fi triplu buffer-at
@@ -68,7 +71,7 @@ public class Game implements Runnable
     private State playState;            /*!< Referinta catre joc.*/
     private State menuState;            /*!< Referinta catre menu.*/
     private State settingsState;        /*!< Referinta catre setari.*/
-    private State aboutState;           /*!< Referinta catre about.*/
+    private State pauseState;
     private KeyManager keyManager;      /*!< Referinta catre obiectul care gestioneaza intrarile din partea utilizatorului.*/
     private RefLinks refLink;            /*!< Referinta catre un obiect a carui sarcina este doar de a retine diverse referinte pentru a fi usor accesibile.*/
 
@@ -135,14 +138,43 @@ public class Game implements Runnable
         playState       = new PlayState(refLink);
         menuState       = new MenuState(refLink);
         settingsState   = new SettingsState(refLink);
-        aboutState      = new AboutState(refLink);
+        pauseState = new PauseState(refLink);
+        sound = Sound.GetInstance();
+
+        refLink.SetSound(sound);
             ///Seteaza starea implicita cu care va fi lansat programul in executie
-        State.SetState(playState);
+        State.SetState(menuState);
 
-        tempScreen = new BufferedImage(wnd.GetWndWidth(),wnd.GetWndHeight(), BufferedImage.TYPE_INT_ARGB);
-        g2 = (Graphics)tempScreen.getGraphics();
+        Connection c = null;
+        Statement stmt = null;
+        try {
+            Class.forName("org.sqlite.JDBC");
+            c = DriverManager.getConnection("jdbc:sqlite:GameDatabase.db");
+            stmt = c.createStatement();
+            String sql;
+            sql = "CREATE TABLE IF NOT EXISTS DATA " +
+                    " (Username TEXT NOT NULL PRIMARY KEY, " +
+                    " Life INT, " +
+                    " Damage INT NOT NULL," +
+                    " HeroX INT NOT NULL, " +
+                    " HeroY INT NOT NULL, " +
+                    " Enemies TEXT," +
+                    " HasChest INT," +
+                    " HasKey INT," +
+                    " Score INT," +
+                    " CurrentLevel INT NOT NULL, " +
+                    " ArmorLevel INT NOT NULL," +
+                    " Kills INT )";
+            stmt.execute(sql);
+            stmt.close();
+            c.close();
+        } catch ( Exception e ) {
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        }
+        System.out.println("Table created successfully");
 
-        //SetFullScreen(); /// IN PROGRESS - DO NOT USE
+        refLink.PlayMusic();
     }
 
     /*! \fn public void run()
@@ -236,6 +268,20 @@ public class Game implements Runnable
         }
     }
 
+    public void Restart(){
+        Sound.Reset();
+        refLink = new RefLinks(this);
+        ///Definirea starilor programului
+        playState       = new PlayState(refLink);
+        menuState       = new MenuState(refLink);
+        settingsState   = new SettingsState(refLink);
+        pauseState = new PauseState(refLink);
+        sound = Sound.GetInstance();
+        refLink.SetSound(sound);
+        State.SetState(playState);
+    }
+
+
     /*! \fn private void Update()
         \brief Actualizeaza starea elementelor din joc.
 
@@ -318,23 +364,19 @@ public class Game implements Runnable
         return keyManager;
     }
 
-    /*! \fn public void SetFullScreen()
-        \brief Modifica valorile variablilelor fullScreenWidth si fullScreenHeight cu valorile rezolutiei ecranului.
-     */
-
-    /// IN PROGRESS - DO NOT USE
-    public void SetFullScreen() {
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        double width = screenSize.getWidth();
-        double height = screenSize.getHeight();
-
-        wnd.GetWndFrame().setExtendedState(JFrame.MAXIMIZED_BOTH);
-
-        fullScreenWidth = (int) width;
-        fullScreenHeight = (int) height;
-
-        System.out.println(fullScreenHeight);
-        System.out.println(fullScreenWidth);
+    public State GetState(int StateID){
+        switch(StateID){
+            case 0:
+                return menuState;
+            case 1:
+                return playState;
+            case 2:
+                return settingsState;
+            case 3:
+                return pauseState;
+        }
+        return null;
     }
+
 }
 

@@ -15,9 +15,9 @@ public class Rock1 extends Object
 
         \param id Id-ul obiectului util in desenarea hartii.
      */
-    public Rock1(int id, int width, int height)
+    public Rock1(int id, int width, int height, boolean Solid)
     {
-        super(Assets.rock1, id);
+        super(Assets.rock1, id,Solid);
         this.width = width;
         this.height = height;
     }

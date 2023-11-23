@@ -1,5 +1,7 @@
 package PaooGame.Tiles;
 
+import PaooGame.Graphics.Assets;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
@@ -8,7 +10,7 @@ import java.awt.image.BufferedImage;
  */
 public class Tile
 {
-    private static final int NO_TILES   = 40;
+    private static final int NO_TILES   = 80;
     public static Tile[] tiles          = new Tile[NO_TILES];       /*!< Vector de referinte de tipuri de dale.*/
 
         /// De remarcat ca urmatoarele dale sunt statice si publice. Acest lucru imi permite sa le am incarcate
@@ -47,6 +49,33 @@ public class Tile
     public static Tile cliffWallLeft       = new CliffWallLeftTile(29);      /*!< Dala de tip stanca/zid/stanga*/
     public static Tile cliffWallCenter       = new CliffWallCenterTile(30);      /*!< Dala de tip stanca/zid/centru*/
     public static Tile cliffWallRight       = new CliffWallRightTile(31);      /*!< Dala de tip stanca/zid/dreapta*/
+
+    public static Tile stairs1 = new Tile(Assets.stairs1,34);
+    public static Tile stairs2 = new Tile(Assets.stairs2,35);
+    public static Tile stairs3 = new Tile(Assets.stairs3,36);
+    public static Tile stairs4 = new Tile(Assets.stairs4,37);
+    public static Tile stairs5 = new Tile(Assets.stairs5,38);
+    public static Tile stairs6 = new Tile(Assets.stairs6,39);
+
+    /// Catacombs
+    public static Tile floor1 = new Tile(Assets.floor1,40);
+
+    public static Tile wall1 = new CatacombsWall(41,Assets.wall1);
+    public static Tile wall2 = new CatacombsWall(42,Assets.wall2);
+    public static Tile wall3 = new CatacombsWall(43,Assets.wall3);
+    public static Tile wall4 = new CatacombsWall(44,Assets.wall4);
+    public static Tile wall5 = new CatacombsWall(45,Assets.wall5);
+    public static Tile wall6 = new CatacombsWall(46,Assets.wall6);
+
+    public static Tile wallLeft = new CatacombsWall(47,Assets.wallLeft);
+    public static Tile wallRight = new CatacombsWall(48,Assets.wallRight);
+    public static Tile wallBottom = new CatacombsWall(49,Assets.wallBottom);
+    public static Tile wallCorner1 = new CatacombsWall(50,Assets.wall1);
+    public static Tile wallCorner2 = new CatacombsWall(51,Assets.wallCorner2);
+    public static Tile wallCorner3 = new CatacombsWall(42,Assets.wallCorner3);
+    public static Tile wallCorner4 = new CatacombsWall(53,Assets.wallCorner4);
+
+
 
     public static final int TILE_WIDTH  = 25;                       /*!< Latimea unei dale.*/
     public static final int TILE_HEIGHT = 25;                       /*!< Inaltimea unei dale.*/
