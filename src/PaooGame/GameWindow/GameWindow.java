@@ -91,6 +91,7 @@ public class GameWindow
         canvas.setMinimumSize(new Dimension(wndWidth, wndHeight));
             /// Avand in vedere ca obiectul de tip canvas, proaspat creat, nu este automat
             /// adaugat in fereastra trebuie apelata metoda add a obiectul wndFrame
+        canvas.setFocusable(false);
         wndFrame.add(canvas);
             /// Urmatorul apel de functie are ca scop eventuala redimensionare a ferestrei
             /// ca tot ce contine sa poate fi afisat complet

@@ -6,7 +6,7 @@ public class Main
 {
     public static void main(String[] args)
     {
-        Game paooGame = new Game("PaooGame");
-        paooGame.StartGame();
+        Game FotHK = new Game("Fate of the Human Kingdom");
+        FotHK.StartGame();
     }
 }

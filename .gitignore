@@ -1,0 +1,61 @@
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Build directories
+/target/
+/out/
+
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+# Maven
+.mvn/
+target/
+
+# Gradle
+.gradle/
+build/
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.swp
+*~
+
+# Java specific
+*.jar
+*.war
+*.ear
+
+# IntelliJ IDEA specific
+# User-specific files
+.idea/.idea_modules
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/dictionaries
+.idea/vcs.xml
+.idea/jsLibraryMappings.xml
+
+# Coverage and profiling
+*.gcda
+*.gcno
+*.gcov
+*.prof
+
+# IntelliJ-specific folders
+.idea/.idea_cache/
+.idea/.idea_cache_lock/
+.idea/.idea_modules/
+.idea/misc.xml
+.idea/.gradle/
