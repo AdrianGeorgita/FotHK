@@ -25,6 +25,8 @@ build/
 .classpath
 .settings/
 
+.docx
+
 # OS-specific files
 .DS_Store
 Thumbs.db
